@@ -1,0 +1,10 @@
+apiVersion: skaffold/v2beta5
+kind: Config
+metadata:
+  name: service-under-test
+build:
+  artifacts:
+    - image: slamdev/resilience-workshop-service-under-test
+      jib: {}
+deploy:
+  kubectl: {}

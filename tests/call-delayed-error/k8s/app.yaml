@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: call-delayed-error
+  namespace: resilience-workshop
+data:
+  job.sh: |-
+    #!/bin/bash
+
+    set -o errexit
+    set -o nounset
+    set -o pipefail
+
+    apk add -u curl
+    while :; do
+      curl -i http://service-under-test/api/delayed-error
+      sleep 1
+    done
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: call-delayed-error
+  namespace: resilience-workshop
+spec:
+  template:
+    spec:
+      containers:
+        - name: app
+          image: alpine
+          command: ["sh",  "-c", "apk add -u bash && bash /opt/job.sh"]
+          volumeMounts:
+            - name: job
+              mountPath: /opt
+      volumes:
+        - name: job
+          configMap:
+            name: call-delayed-error
+      restartPolicy: Never

@@ -1,0 +1,13 @@
+apiVersion: skaffold/v2beta5
+kind: Config
+metadata:
+  name: pubsub-emulator
+build:
+  artifacts:
+    - image: slamdev/resilience-workshop-pubsub-emulator
+      docker:
+        cacheFrom:
+          - google/cloud-sdk:alpine
+          - slamdev/resilience-workshop-pubsub-emulator
+deploy:
+  kubectl: {}

@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: faulty-service
+  namespace: resilience-workshop
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+  selector:
+    app: faulty-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: faulty-service-app
+  namespace: resilience-workshop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: faulty-service
+  template:
+    metadata:
+      labels:
+        app: faulty-service
+    spec:
+      containers:
+        - image: slamdev/resilience-workshop-faulty-service
+          imagePullPolicy: IfNotPresent
+          name: app
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            requests:
+              cpu: "1"
+              memory: 1Gi
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http

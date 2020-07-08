@@ -1,0 +1,19 @@
+apiVersion: skaffold/v2beta5
+kind: Config
+metadata:
+  name: mongodb
+deploy:
+  helm:
+    releases:
+      - name: mongodb
+        chartPath: mongodb
+        remote: true
+        namespace: resilience-workshop
+        version: 8.0.9
+        valuesFiles:
+          - values.yaml
+    flags:
+      install:
+        - "--repo=https://charts.bitnami.com/bitnami"
+      upgrade:
+        - "--repo=https://charts.bitnami.com/bitnami"

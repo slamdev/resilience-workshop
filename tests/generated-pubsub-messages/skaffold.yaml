@@ -1,0 +1,6 @@
+apiVersion: skaffold/v2beta5
+kind: Config
+metadata:
+  name: generated-base-load
+deploy:
+  kubectl: {}

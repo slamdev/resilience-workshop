@@ -1,0 +1,10 @@
+apiVersion: skaffold/v2beta5
+kind: Config
+metadata:
+  name: faulty-service
+build:
+  artifacts:
+    - image: slamdev/resilience-workshop-faulty-service
+      jib: {}
+deploy:
+  kubectl: {}

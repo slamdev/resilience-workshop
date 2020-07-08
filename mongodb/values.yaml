@@ -1,0 +1,16 @@
+image:
+  tag: 3.6
+auth:
+  enabled: true
+  username: user
+  password: pass
+  database: resilience-workshop
+resources:
+  limits:
+     cpu: 100m
+     memory: 128Mi
+  requests:
+     cpu: 100m
+     memory: 128Mi
+persistence:
+  enabled: false
