@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: generate-db-entries
+  namespace: resilience-workshop
+data:
+  job.sh: |-
+    #!/bin/bash
+
+    set -o errexit
+    set -o nounset
+    set -o pipefail
+
+    echo 'http://dl-cdn.alpinelinux.org/alpine/v3.9/main' >> /etc/apk/repositories
+    echo 'http://dl-cdn.alpinelinux.org/alpine/v3.9/community' >> /etc/apk/repositories
+    apk add -u mongodb yaml-cpp=0.6.2-r2
+
+    for j in {1..100}; do
+      docs='{ _id : ObjectId(), name : "test0" }'
+      for i in {1..100}; do
+         docs="$docs,{ _id : ObjectId(), name : \"test$i\" }"
+      done
+      mongo "mongodb://user:pass@mongodb:27017/resilience-workshop" --eval "db.sample.insertMany([$docs])"
+    done
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: generate-db-entries
+  namespace: resilience-workshop
+spec:
+  template:
+    spec:
+      containers:
+        - name: app
+          image: alpine
+          command: ["sh",  "-c", "apk add -u bash && bash /opt/job.sh"]
+          volumeMounts:
+            - name: job
+              mountPath: /opt
+      volumes:
+        - name: job
+          configMap:
+            name: generate-db-entries
+      restartPolicy: Never

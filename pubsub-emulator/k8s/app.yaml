@@ -15,7 +15,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pubsub-emulator-app
+  name: pubsub-emulator
   namespace: resilience-workshop
 spec:
   replicas: 1
@@ -44,3 +44,10 @@ spec:
       volumes:
         - name: data-dir
           emptyDir: {}
+      nodeSelector:
+        node_pool: preemptible
+      tolerations:
+        - key: preemptible
+          operator: Equal
+          value: "true"
+          effect: NoSchedule

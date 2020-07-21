@@ -13,8 +13,8 @@ data:
 
     apk add -u curl
     while :; do
-      curl -i http://service-under-test/api/delayed-error
-      sleep 1
+      curl -i http://service-under-test/api/delayed-error &>/dev/null &
+      sleep 0.1
     done
 ---
 apiVersion: batch/v1

@@ -7,10 +7,17 @@ auth:
   database: resilience-workshop
 resources:
   limits:
-     cpu: 100m
-     memory: 128Mi
+     cpu: 50m
+     memory: 200Mi
   requests:
-     cpu: 100m
-     memory: 128Mi
+     cpu: 50m
+     memory: 200Mi
 persistence:
   enabled: false
+nodeSelector:
+  node_pool: preemptible
+tolerations:
+  - key: preemptible
+    operator: Equal
+    value: "true"
+    effect: NoSchedule

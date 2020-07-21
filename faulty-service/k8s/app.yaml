@@ -15,7 +15,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: faulty-service-app
+  name: faulty-service
   namespace: resilience-workshop
 spec:
   replicas: 1
@@ -38,11 +38,10 @@ spec:
             requests:
               cpu: "1"
               memory: 1Gi
-          readinessProbe:
-            httpGet:
-              path: /actuator/health
-              port: http
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: http
+      nodeSelector:
+        node_pool: preemptible
+      tolerations:
+        - key: preemptible
+          operator: Equal
+          value: "true"
+          effect: NoSchedule

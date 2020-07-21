@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: call-random-error
+  name: call-slow-db-query
   namespace: resilience-workshop
 data:
   job.sh: |-
@@ -13,14 +13,14 @@ data:
 
     apk add -u curl
     while :; do
-      curl -i http://service-under-test/api/random-error &>/dev/null &
+      curl -i http://service-under-test/api/slow-db-query &>/dev/null &
       sleep 0.1
     done
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: call-random-error
+  name: call-slow-db-query
   namespace: resilience-workshop
 spec:
   template:
@@ -35,5 +35,5 @@ spec:
       volumes:
         - name: job
           configMap:
-            name: call-random-error
+            name: call-slow-db-query
       restartPolicy: Never

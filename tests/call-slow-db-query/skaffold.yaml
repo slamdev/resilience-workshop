@@ -1,0 +1,6 @@
+apiVersion: skaffold/v2beta5
+kind: Config
+metadata:
+  name: call-slow-db-query
+deploy:
+  kubectl: {}

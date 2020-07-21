@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: call-random-error
+  name: generate-pubsub-messages
   namespace: resilience-workshop
 data:
   job.sh: |-
@@ -12,15 +12,21 @@ data:
     set -o pipefail
 
     apk add -u curl
+
     while :; do
-      curl -i http://service-under-test/api/random-error &>/dev/null &
-      sleep 0.1
+      mgss="{\"data\": \"a0\"}"
+      for j in {1..99}; do
+        mgss="$mgss,{\"data\": \"a${j}\"}"
+      done
+      echo "$mgss"
+      curl -H 'content-type: application/json' -X POST --data $"{\"messages\": [$mgss]}" http://pubsub-emulator:8085/v1/projects/fake/topics/sample-topic:publish
     done
+
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: call-random-error
+  name: generate-pubsub-messages
   namespace: resilience-workshop
 spec:
   template:
@@ -35,5 +41,5 @@ spec:
       volumes:
         - name: job
           configMap:
-            name: call-random-error
+            name: generate-pubsub-messages
       restartPolicy: Never

@@ -28,14 +28,13 @@ public class Application {
     @GetMapping("slow-error-response")
     public void slowResponseWithError(HttpServletResponse response) throws InterruptedException {
         LOGGER.info("{} is called", "slow-error-response");
-        TimeUnit.SECONDS.sleep(30);
+        TimeUnit.SECONDS.sleep(50);
         response.setStatus(HttpServletResponse.SC_GATEWAY_TIMEOUT);
     }
 
     @GetMapping("random-error-response")
     public void responseWithRandomError(HttpServletResponse response) throws InterruptedException {
         LOGGER.info("{} is called", "random-error-response");
-        TimeUnit.SECONDS.sleep(1);
         if (RANDOM.nextBoolean()) {
             response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
             return;

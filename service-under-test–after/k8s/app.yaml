@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-under-test
+  namespace: resilience-workshop
+  labels:
+    app: service-under-test
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+    - name: http-actuator
+      port: 8787
+      targetPort: http-actuator
+  selector:
+    app: service-under-test
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-under-test
+  namespace: resilience-workshop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-under-test
+  template:
+    metadata:
+      labels:
+        app: service-under-test
+    spec:
+      containers:
+        - image: slamdev/resilience-workshop-service-under-test
+          imagePullPolicy: IfNotPresent
+          name: app
+          ports:
+            - name: http
+              containerPort: 8080
+            - name: http-actuator
+              containerPort: 8787
+          resources:
+            requests:
+              cpu: 100m
+              memory: 384Mi
+            limits:
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http-actuator
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http-actuator
+      nodeSelector:
+        node_pool: preemptible
+      tolerations:
+        - key: preemptible
+          operator: Equal
+          value: "true"
+          effect: NoSchedule
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: service-under-test
+  namespace: resilience-workshop
+spec:
+  endpoints:
+    - port: http-actuator
+      path: /actuator/prometheus
+  selector:
+    matchLabels:
+      app: service-under-test
